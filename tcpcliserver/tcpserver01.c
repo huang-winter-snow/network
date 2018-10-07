@@ -4,8 +4,10 @@ int main(int argc, char **argv)
 {
 	int listenfd, connfd;
 	pid_t childpid;
-	socklen_t chilen;
+	socklen_t clilen;
 	struct sockaddr_in cliaddr, servaddr;
+	void sig_chld(int);
+
 	listenfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	memset(&servaddr, 0, sizeof(servaddr));
@@ -15,9 +17,17 @@ int main(int argc, char **argv)
 	bind(listenfd, (SA *)&servaddr, sizeof(servaddr));
 	listen(listenfd, LISTENQ);
 
+	Signal(SIGCHLD, sig_chld);
+
 	for( ; ; ) {
 		clilen = sizeof(cliaddr);
-		connfd = accept(listenfd, (SA *)&cliaddr, &clilen);
+		if (connfd = accept(listenfd, (SA *)&cliaddr, &clilen) < 0) {
+			if (errno == EINTR) {
+				continue;
+			} else {
+				err_sys("accept error");
+			}
+		}
 
 		if ((childpid = fork()) == 0) {
 			close(listenfd);

@@ -1,4 +1,5 @@
 #include "unp.h"
+
 int main(int argc, char **argv)
 {
 	int sockfd;
@@ -11,7 +12,7 @@ int main(int argc, char **argv)
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(SERV_PORT);
-	inet_pton(AF_INET, agrv[1], &servaddr.sin_addr);
+	inet_pton(AF_INET, argv[1], &servaddr.sin_addr);
 
 	connect(sockfd, (SA *) &servaddr, sizeof(servaddr));
 	str_cli(stdin, sockfd);
